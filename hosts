@@ -1,0 +1,23 @@
+[DNS Config]
+google_dns = tcp://8.8.8.8, tcp://8.8.4.4
+open_dns = 208.67.220.220, udp://208.67.222.222:53
+
+[hosts]
+! Line starts with ! in this segement will be treated as comment, no inline comment support
+! Compatible with traditional hosts grammar
+! You can use wildcard '*' and '?' in domain name
+! '*' will match any content in domain name, '?' will match content in only one level of domain
+! e.g. *.google.com will match www.google.com and www.l.google.com
+! e.g. ?.google.com will only match www.google.com, www.l.google.com won't be matched
+! Domain name starts and ends with '/' will be treated as regular expression rule
+! A regular expression rule will be sent to regular expression engine to perform match directly
+! Rules starts with dns name which declared in [DNS Config] section will be resolved by specific server only
+! Each rule has it's own priority, from 1 to 5, 1 is the highest priority and 5 is the lowest
+! The traditional hosts rule -- IP<tabs or spaces>domain -- will be treated as priority level 2 (mid-high)
+! Regular expression rule, or any rule which domain name contains '*' or '?' will be treated as priority level 3 (mid)
+! Rule which specific the dns server will be treated as priority level 4 (mid-low)
+! Priority level 1 and 5 will not be apply to rule implicitly
+! You can assign the priority explicitly by adding '<[1-5]> ' to the head of each rule
+
+google_dns *.google.?
+google_dns *.blogspot.com
