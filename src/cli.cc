@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016  Sunny <ratsunny@gmail.com>
+ * Copyright (C) 2018  Sunny <ratsunny@gmail.com>
  *
  * This file is part of CrappyDNS.
  *
@@ -29,7 +29,7 @@
 #include "trusted_net.h"
 
 void PrintHelpMessage() {
-  printf("CrappyDNS version %s\n", GIT_DESCRIBE);
+  printf("CrappyDNS %s\n", VERSION);
   // clang-format off
   printf(
     "Usage: crappydns [-l LISTEN_ADDR] [-p LISTEN_PORT] [-t TIMEOUT_IN_MS]\n"
@@ -130,7 +130,7 @@ char ParseConfig(int argc, char** argv) {
         }
         break;
       case 'v':
-        printf("CrappyDNS %s\n", GIT_DESCRIBE);
+        printf("CrappyDNS %s\n", VERSION);
         exit(0);
         break;
       case 'V':

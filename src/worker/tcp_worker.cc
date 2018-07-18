@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016  Sunny <ratsunny@gmail.com>
+ * Copyright (C) 2018  Sunny <ratsunny@gmail.com>
  *
  * This file is part of CrappyDNS.
  *
@@ -52,7 +52,7 @@ void TCPWorker::OnInternalRecv(uv_stream_t* handle,
       uint8_t hi = *pkt_cur++, lo = *pkt_cur++;
       uint16_t pkt_size = (hi << 8) + lo;
 
-      if (recv_buffer_.size() < pkt_size + 2) {
+      if (recv_buffer_.size() < pkt_size + 2u) {
         break;
       }
 
@@ -67,7 +67,7 @@ void TCPWorker::OnInternalRecv(uv_stream_t* handle,
         VERB << *remote_server_ << ": Remove session " << pkt_id << " from pool"
              << ENDL;
         if (recv_cb_)
-          recv_cb_({.payload = pkt, .dns_server = remote_server_});
+          recv_cb_(CrPacket{.payload = pkt, .dns_server = remote_server_});
       } else {
         WARN << *remote_server_ << ": Can't found session " << pkt_id
              << " in pool, it may caused by a remote double send" << ENDL;
@@ -194,8 +194,8 @@ int TCPWorker::Send(std::shared_ptr<CrSession> session) {
 
   query_pool_[session->pipelined_id_] =
       Query{.retry_count = 0,
-            .request = session->request_payload_,
-            .size = htons(session->request_payload_->size())};
+            .size = htons(session->request_payload_->size()),
+            .request = session->request_payload_};
 
   return RequestSend(&query_pool_[session->pipelined_id_]);
 }

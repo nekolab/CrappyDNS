@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016  Sunny <ratsunny@gmail.com>
+ * Copyright (C) 2018  Sunny <ratsunny@gmail.com>
  *
  * This file is part of CrappyDNS.
  *
@@ -20,6 +20,7 @@
 #ifndef _CR_UTILS_H_
 #define _CR_UTILS_H_
 
+#include <cstring>
 #include <ctime>
 #include <functional>
 #include <iostream>

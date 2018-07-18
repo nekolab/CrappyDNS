@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016  Sunny <ratsunny@gmail.com>
+ * Copyright (C) 2018  Sunny <ratsunny@gmail.com>
  *
  * This file is part of CrappyDNS.
  *
@@ -168,9 +168,9 @@ bool HostsRule::Match(std::string domain, uint16_t type) const {
       return ((type & addr_type_) == type || dns_server_list_ != nullptr) &&
              host_ == domain;
     case Type::kWildcard:
-    case Type::kRegex: {
+    case Type::kRegex:
+    default:
       return ((type & addr_type_) == type || dns_server_list_ != nullptr) &&
              std::regex_match(domain, host_regex_);
-    }
   }
 }

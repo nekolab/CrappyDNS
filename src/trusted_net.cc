@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016  Sunny <ratsunny@gmail.com>
+ * Copyright (C) 2018  Sunny <ratsunny@gmail.com>
  *
  * This file is part of CrappyDNS.
  *
@@ -24,6 +24,8 @@
 #include <cstdio>
 #include <fstream>
 #include <string>
+
+#include <arpa/inet.h>
 
 static bool cmp_route(const CrTrustedNet::RouteEntry& lhs,
                       const CrTrustedNet::RouteEntry& rhs) {

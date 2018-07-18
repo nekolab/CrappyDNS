@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016  Sunny <ratsunny@gmail.com>
+ * Copyright (C) 2018  Sunny <ratsunny@gmail.com>
  *
  * This file is part of CrappyDNS.
  *
@@ -30,8 +30,12 @@
 
 #include <uv.h>
 
-#ifndef GIT_DESCRIBE
-#define GIT_DESCRIBE "development"
+#ifdef HAVE_CONFIG_H
+#include "../config.h"
+#endif
+
+#ifndef VERSION
+#define VERSION "development"
 #endif
 
 #define UDP_BUF_SIZE 640

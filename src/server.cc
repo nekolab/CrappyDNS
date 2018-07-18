@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016  Sunny <ratsunny@gmail.com>
+ * Copyright (C) 2018  Sunny <ratsunny@gmail.com>
  *
  * This file is part of CrappyDNS.
  *
@@ -53,7 +53,8 @@ static void recv_cb(uv_udp_t* handle,
     auto addr_ptr = std::make_shared<struct sockaddr_storage>();
     ::memcpy(addr_ptr.get(), addr, get_sockaddr_size(addr));
     if (self->recv_cb_)
-      self->recv_cb_({.payload = payload, .addr = addr_ptr});
+      self->recv_cb_(CrPacket{
+          .payload = payload, .dns_server = nullptr, .addr = addr_ptr});
   } else if (nread != 0) {
     self->Close();
   }

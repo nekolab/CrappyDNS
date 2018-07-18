@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016  Sunny <ratsunny@gmail.com>
+ * Copyright (C) 2018  Sunny <ratsunny@gmail.com>
  *
  * This file is part of CrappyDNS.
  *
@@ -91,7 +91,7 @@ void UDPWorker::OnInternalRecv(uv_udp_t* handle,
   if (nread >= 0 && addr != nullptr && cmp_sockaddr(remote_addr, addr) == 0) {
     if (recv_cb_) {
       auto pkt = std::make_shared<u8_vec>(buf->base, buf->base + nread);
-      recv_cb_({.payload = pkt, .dns_server = remote_server_});
+      recv_cb_(CrPacket{.payload = pkt, .dns_server = remote_server_});
     }
   } else if (nread != 0) {
     InternalClose();
