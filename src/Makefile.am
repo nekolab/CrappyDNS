@@ -11,4 +11,5 @@ crappydns_SOURCES = cli.cc \
                     worker/tcp_worker.cc \
                     worker/udp_worker.cc \
                     trusted_net.cc \
-                    utils.cc
+                    utils.cc \
+                    runas.cc

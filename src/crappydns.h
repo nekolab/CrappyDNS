@@ -67,6 +67,7 @@ struct CrPacket {
 struct CrConfig {
   static bool verbose_mode;
   static uint64_t timeout_in_ms;
+  static const char* run_as_user;
   static CrappyHosts hosts;
   static CrTrustedNet trusted_net;
   static struct sockaddr_storage listen_addr;

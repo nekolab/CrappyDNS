@@ -20,7 +20,10 @@ AC_CHECK_LIB(resolv, res_query, [],
 AC_CHECK_LIB(uv, uv_run, [], [AC_MSG_ERROR([libuv not found.])])
 
 # Checks for header files.
-AC_CHECK_HEADERS([netinet/in.h sys/socket.h arpa/inet.h arpa/nameser.h arpa/nameser_compat.h uv.h getopt.h])
+AC_CHECK_HEADERS([netinet/in.h sys/socket.h])
+AC_CHECK_HEADERS([arpa/inet.h arpa/nameser.h arpa/nameser_compat.h])
+AC_CHECK_HEADERS([getopt.h pwd.h grp.h errno.h])
+AC_CHECK_HEADERS([uv.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_CHECK_HEADER_STDBOOL
@@ -34,6 +37,7 @@ AC_TYPE_UINT8_T
 
 # Checks for library functions.
 AC_CHECK_FUNCS([strdup strstr strtol])
+AC_CHECK_FUNCS([geteuid getpwuid getpwnam getpwuid_r getpwnam_r setgid setuid initgroups])
 
 AC_CONFIG_FILES([Makefile src/Makefile])
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016  Sunny <ratsunny@gmail.com>
+ * Copyright (C) 2018  Sunny <ratsunny@gmail.com>
  *
  * This file is part of CrappyDNS.
  *
@@ -25,6 +25,7 @@
 // CrConfig static initialization
 bool CrConfig::verbose_mode(false);
 uint64_t CrConfig::timeout_in_ms(3000);
+const char* CrConfig::run_as_user(nullptr);
 CrappyHosts CrConfig::hosts = {};
 CrTrustedNet CrConfig::trusted_net = {};
 struct sockaddr_storage CrConfig::listen_addr = {};

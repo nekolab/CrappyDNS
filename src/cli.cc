@@ -23,6 +23,7 @@
 #include <cstdlib>
 
 #include "hosts/hosts.h"
+#include "runas.h"
 #include "server.h"
 #include "session.h"
 #include "session_manager.h"
@@ -34,7 +35,7 @@ void PrintHelpMessage() {
   printf(
     "Usage: crappydns [-l LISTEN_ADDR] [-p LISTEN_PORT] [-t TIMEOUT_IN_MS]\n"
     "         [-b POISONED_DNS_LIST] [-g HEALTHY_DNS_LIST] [-v] [-V] [-h]\n"
-    "         [-n TRUSTED_NET_PATH] [-o TRUSTED_NET_PATH]\n"
+    "         [-n TRUSTED_NET_PATH] [-o TRUSTED_NET_PATH] [-a USER]\n"
     "A crappy DNS repeater\n"
     "\n"
     "Options:\n"
@@ -49,6 +50,7 @@ void PrintHelpMessage() {
     "[-l, --listen <addr>]\tListen address of your local server,\n"
     "\t\t\tdefault to 127.0.0.1\n"
     "[-t, --timeout <msec>]\tTimeout for each session, default to 3000\n"
+    "[-a, --run-as <user>]\tRun as another user\n"
     "[-v, --version]\t\tPrint version and exit\n"
     "[-V, --verbose]\t\tVerbose logging\n"
     "[-h, --help]\t\tPrint this message\n");
@@ -75,12 +77,13 @@ char ParseConfig(int argc, char** argv) {
       {"optimize", required_argument, nullptr, 'o'},
       {"listen", required_argument, nullptr, 'l'},
       {"timeout", required_argument, nullptr, 't'},
+      {"run-as", required_argument, nullptr, 'a'},
       {"version", no_argument, nullptr, 'v'},
       {"verbose", no_argument, nullptr, 'V'},
       {"help", no_argument, nullptr, 'h'},
       {nullptr, no_argument, nullptr, 0}};
 
-  while ((c = getopt_long(argc, argv, "p:b:g:n:s:o:l:t:vVh", long_options,
+  while ((c = getopt_long(argc, argv, "p:b:g:n:s:o:l:t:a:vVh", long_options,
                           &option_index)) != -1) {
     switch (c) {
       case 'o':
@@ -129,6 +132,9 @@ char ParseConfig(int argc, char** argv) {
           return c;
         }
         break;
+      case 'a':
+        CrConfig::run_as_user = optarg;
+        break;
       case 'v':
         printf("CrappyDNS %s\n", VERSION);
         exit(0);
@@ -176,6 +182,19 @@ int main(int argc, char** argv) {
   }
 
   INFO << "Listening at " << *(SockAddr*)&CrConfig::listen_addr << ENDL;
+
+  if (CrConfig::run_as_user) {
+    if (RunAs(CrConfig::run_as_user)) {
+      INFO << "Running as " << CrConfig::run_as_user << ENDL;
+    } else {
+      ERR << "Failed to switch user" << ENDL;
+      exit(0);
+    }
+  }
+
+  if (IsRoot()) {
+    INFO << "Running as root" << ENDL;
+  }
 
   uv_run(uv_loop, UV_RUN_DEFAULT);
   uv_loop_close(uv_loop);
