@@ -35,24 +35,28 @@
 
 extern std::ostream __null_stream;
 
-#define __LOG(stream, is_verbose, with_time, prefix)                       \
+#define __LOG(stream, is_verbose, prefix)                                  \
   if (!is_verbose || CrConfig::verbose_mode) {                             \
     std::time_t __now;                                                     \
     std::time(&__now);                                                     \
     char __log_time_buf[10];                                               \
     std::strftime(__log_time_buf, 10, "%H:%M:%S", std::localtime(&__now)); \
-    if (with_time) {                                                       \
-      stream << "[" << (const char*)__log_time_buf << "]" << std::flush;   \
-    }                                                                      \
+    stream << "[" << (const char*)__log_time_buf << "]" << std::flush;     \
     stream << prefix << std::flush;                                        \
   }                                                                        \
-  ((!is_verbose || CrConfig::verbose_mode) ? stream : __null_stream)
+  stream
 
-#define LOG __LOG(std::cout, false, true, "[LOG] ")
-#define ERR __LOG(std::cerr, false, true, "[ERR] ")
-#define VERB __LOG(std::cout, true, true, "[VERB] ")
-#define WARN __LOG(std::cout, false, true, "[WARN] ")
-#define INFO __LOG(std::cout, false, true, "[INFO] ")
+#define LOG_S std::cout
+#define ERR_S std::cerr
+#define VERB_S (CrConfig::verbose_mode ? std::cout : __null_stream)
+#define WARN_S std::cout
+#define INFO_S std::cout
+
+#define LOG __LOG(LOG_S, false, "[LOG] ")
+#define ERR __LOG(ERR_S, false, "[ERR] ")
+#define VERB __LOG(VERB_S, true, "[VERB] ")
+#define WARN __LOG(WARN_S, false, "[WARN] ")
+#define INFO __LOG(INFO_S, false, "[INFO] ")
 
 #define ENDL std::endl
 

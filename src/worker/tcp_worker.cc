@@ -64,13 +64,14 @@ void TCPWorker::OnInternalRecv(uv_stream_t* handle,
         if (send_cb_)
           send_cb_(pkt_id, remote_server_, 0);
         query_pool_.erase(pkt_id);
-        VERB << *remote_server_ << ": Remove session " << pkt_id << " from pool"
-             << ENDL;
+        VERB << "[" << pkt_id << "][TCP Worker][" << *remote_server_
+             << "] Session removed from pool" << ENDL;
         if (recv_cb_)
           recv_cb_(CrPacket{.payload = pkt, .dns_server = remote_server_});
       } else {
-        WARN << *remote_server_ << ": Can't found session " << pkt_id
-             << " in pool, it may caused by a remote double send" << ENDL;
+        INFO << "[" << pkt_id << "][TCP Worker] Could not found session in ["
+             << *remote_server_
+             << "]'s pool, it may caused by a remote double send" << ENDL;
       }
       recv_buffer_.erase(recv_buffer_.begin(), pkt_end);
     }
@@ -177,17 +178,17 @@ int TCPWorker::RequestSend(Query* query) {
 int TCPWorker::Send(std::shared_ptr<CrSession> session) {
   if (uv_tcp_ == nullptr) {
     int rtn = RequestConnect();
-    VERB << *remote_server_ << ": Connect returns " << *(UVError*)&rtn
-         << " for session " << session->pipelined_id_ << ENDL;
+    VERB << "[" << session->pipelined_id_ << "][TCPWorker] Connect to "
+         << *remote_server_ << ", " << *(UVError*)&rtn << ENDL;
     if (rtn < 0) {
       return rtn;
     }
   }
 
   if (query_pool_.find(session->pipelined_id_) != query_pool_.end()) {
-    ERR << *remote_server_
-        << ": DNS Pipelined ID exist: " << session->pipelined_id_
-        << ", query_pool_ size: " << query_pool_.size() << ENDL;
+    ERR << "[" << session->pipelined_id_ << "][TCP Worker][" << *remote_server_
+        << "] Duplicated DNS pipelined ID detected! "
+        << "query_pool_ size: " << query_pool_.size() << ENDL;
 
     assert(query_pool_.find(session->pipelined_id_) == query_pool_.end());
   }
@@ -210,8 +211,8 @@ int TCPWorker::InternalClose() {
     auto& query = it->second;
     if (++query.retry_count > kRetryThreshold) {
       /* TODO: Check SessionManager::Has(it->first) */
-      VERB << *remote_server_ << ": Remove session " << it->first
-           << " from pool in retry cycle" << ENDL;
+      VERB << "[" << it->first << "][TCP Worker] Session removed from ["
+           << *remote_server_ << "]'s pool due to retry overlimit" << ENDL;
       if (send_cb_)
         send_cb_(it->first, remote_server_, UV_ECONNABORTED);
       it = query_pool_.erase(it);
@@ -223,8 +224,9 @@ int TCPWorker::InternalClose() {
   int query_count = (int)query_pool_.size();
   if (query_count > 0) {
     int rtn = RequestConnect();
-    VERB << *remote_server_ << ": Pipelined connect returns " << *(UVError*)&rtn
-         << " for query queue" << ENDL;
+    VERB << "[TCP Worker][" << *remote_server_
+         << "]: Pipelined connect returns " << *(UVError*)&rtn
+         << " for queued query" << ENDL;
     if (rtn < 0) {
       return rtn;
     }

@@ -181,7 +181,8 @@ int main(int argc, char** argv) {
     return rtn;
   }
 
-  INFO << "Listening at " << *(SockAddr*)&CrConfig::listen_addr << ENDL;
+  INFO << "[Server] Listening at " << *(SockAddr*)&CrConfig::listen_addr
+       << ENDL;
 
   if (CrConfig::run_as_user) {
     if (RunAs(CrConfig::run_as_user)) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016  Sunny <ratsunny@gmail.com>
+ * Copyright (C) 2018  Sunny <ratsunny@gmail.com>
  *
  * This file is part of CrappyDNS.
  *
@@ -100,12 +100,12 @@ void CrSessionManager::OnRemoteRecv(CrPacket response) {
 
   if (ns_initparse((const unsigned char*)response.payload->data(),
                    response.payload->size(), &msg) < 0) {
-    ERR << "Packet from " << *response.dns_server << " parse error " << ENDL;
+    INFO << "Packet from " << *response.dns_server << " parse error " << ENDL;
     return;
   }
 
   uint16_t pipelined_id = ns_msg_id(msg);
-  VERB << "Received response for " << pipelined_id << " from "
+  VERB << "[" << pipelined_id << "] Received response from "
        << *response.dns_server << ENDL;
   auto session = Get(pipelined_id);
   if (session != nullptr) {
@@ -123,15 +123,16 @@ void CrSessionManager::Resolve(uint16_t pipelined_id) {
   ns_put16(session->raw_id_,
            (unsigned char*)session->candidate_response_->data());
   server_->Send(session);
-  VERB << "Session " << session->pipelined_id_ << " resolved" << ENDL;
+  VERB << "[" << session->pipelined_id_ << "] Session resolved" << ENDL;
 }
 
 void CrSessionManager::PrepareServer() {
   server_->recv_cb_ = [this](CrPacket packet) {
+    VERB << "[Server] Request received from " << *(SockAddr*)(packet.addr.get())
+         << ENDL;
     auto session = this->Create(packet);
     if (session == nullptr)
       return;
-    VERB << "Server recved session " << session->pipelined_id_ << ENDL;
     this->Dispatch(session->pipelined_id_);
   };
 }
@@ -140,7 +141,7 @@ void CrSessionManager::PrepareSender() {
   sender_.send_cb_ = [this](uint16_t session_id,
                             std::shared_ptr<const CrDNSServer> server,
                             int status) {
-    VERB << "Session " << session_id << ": Send to " << *server << ", "
+    VERB << "[" << session_id << "] Send to " << *server << ", "
          << *(UVError*)&status << ENDL;
     if (status == 0) {
       auto session = this->Get(session_id);
@@ -151,7 +152,7 @@ void CrSessionManager::PrepareSender() {
   };
 
   sender_.recv_cb_ = [this](CrPacket response) {
-    VERB << "Worker recved " << response.payload->size() << " bytes from "
+    VERB << "[Worker] Recved " << response.payload->size() << " bytes from "
          << *response.dns_server << ENDL;
     this->OnRemoteRecv(response);
   };
@@ -163,19 +164,31 @@ void CrSessionManager::PrepareSender() {
 
 void CrSessionManager::GenShuffleSequence(uint_fast32_t seed) {
   std::minstd_rand mr(seed);
-  VERB << "Shuffle sequence: " << ENDL;
   for (int i = 0; i < kShuffleTimes; ++i) {
     std::uniform_int_distribution<> uid(i, kShuffleTimes);
     shuffle_seq_[i] = uid(mr);
-    VERB << "[ " << i << " <=> " << (int)shuffle_seq_[i] << " ] " << ENDL;
+  }
+
+  if (CrConfig::verbose_mode) {
+    uint8_t pokers[16];
+    for (size_t i = 0; i < 16; ++i)
+      pokers[i] = i;
+    for (size_t i = 0, j; i < kShuffleTimes; ++i) {
+      j = shuffle_seq_[i];
+      uint8_t val = pokers[i];
+      pokers[i] = pokers[j];
+      pokers[j] = val;
+    }
+    VERB << "[Init] Shuffle param: [ ";
+    for (size_t i = 0; i < 16; ++i)
+      VERB_S << unsigned(pokers[i]) << " ";
+    VERB_S << "]" << ENDL;
   }
 }
 
 uint16_t CrSessionManager::GenPipelinedID() {
   counter_ += mr_step_() % 97 + 1;
   uint16_t counter = counter_, mask = 0;
-
-  VERB << "Current counter is: " << counter_ << ENDL;
 
   // magic to counter
   for (size_t i = 0, j = 0; i < kShuffleTimes; ++i) {
@@ -184,5 +197,6 @@ uint16_t CrSessionManager::GenPipelinedID() {
     counter ^= (mask << i) | (mask << j);
   }
 
+  VERB << "[" << counter << "] Session ID generated from " << counter_ << ENDL;
   return counter;
 }
