@@ -62,7 +62,8 @@ CrSession::CrSession(CrSessionManager* manager, CrPacket packet)
     if (matched_rule_ != nullptr) {
       status_ = Status::kDedicated;
     }
-    VERB << "[" << pipelined_id_ << "] Query: " << query_name_ << ENDL;
+    VERB << "[" << pipelined_id_ << "] Query " << raw_id_ << ": " << query_name_
+         << ENDL;
   }
 }
 
@@ -125,7 +126,7 @@ void CrSession::Resolve(CrPacket& response, ns_msg& msg) {
     }
   }
 
-  if (response_on_the_way_ <= 0 || status_ == Status::kResolved) {
+  if (response_on_the_way_ == 0 || status_ == Status::kResolved) {
     manager_->Resolve(pipelined_id_);
   }
 }

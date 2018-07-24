@@ -75,6 +75,7 @@ bool CrSessionManager::Dispatch(uint16_t pipelined_id) {
     if (rule->dns_server_list_ != nullptr) {
       for (const auto& server : *rule->dns_server_list_) {
         sender_.SendTo(session, server);
+        ++session->response_on_the_way_;
       }
       return true;
     }
@@ -143,10 +144,10 @@ void CrSessionManager::PrepareSender() {
                             int status) {
     VERB << "[" << session_id << "] Send to " << *server << ", "
          << *(UVError*)&status << ENDL;
-    if (status == 0) {
+    if (status != 0) {
       auto session = this->Get(session_id);
       if (session) {
-        ++session->response_on_the_way_;
+        --session->response_on_the_way_;
       }
     }
   };

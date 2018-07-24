@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016  Sunny <ratsunny@gmail.com>
+ * Copyright (C) 2018  Sunny <ratsunny@gmail.com>
  *
  * This file is part of CrappyDNS.
  *
@@ -54,6 +54,7 @@ std::shared_ptr<CrWorker> CrappySender::RegisterDNSServer(
 void CrappySender::Send(std::shared_ptr<CrSession> session) {
   for (auto&& worker : worker_list_) {
     worker->Send(session);
+    ++session->response_on_the_way_;
   }
 }
 

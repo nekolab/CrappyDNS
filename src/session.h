@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016  Sunny <ratsunny@gmail.com>
+ * Copyright (C) 2018  Sunny <ratsunny@gmail.com>
  *
  * This file is part of CrappyDNS.
  *
@@ -49,7 +49,7 @@ class CrSession {
   uint16_t raw_id_;
   uint16_t query_type_;
   uint16_t pipelined_id_;
-  uint8_t response_on_the_way_;
+  uint16_t response_on_the_way_;
 
   std::string query_name_;
   std::shared_ptr<u8_vec> request_payload_;
