@@ -62,8 +62,7 @@ CrSession::CrSession(CrSessionManager* manager, CrPacket packet)
     if (matched_rule_ != nullptr) {
       status_ = Status::kDedicated;
     }
-    VERB << "[" << pipelined_id_ << "] Query " << raw_id_ << ": " << query_name_
-         << ENDL;
+    VERB("[" << pipelined_id_ << "] Query " << raw_id_ << ": " << query_name_);
   }
 }
 
@@ -107,17 +106,17 @@ void CrSession::Resolve(CrPacket& response, ns_msg& msg) {
         if (type == ns_t_a) {
           bool in_trusted_net =
               CrConfig::trusted_net.Contains(ntohl(*(uint32_t*)rd));
-          // VERB << "[" << pipelined_id_ << "] [A]"
-          //      << (from_healthy_dns ? "[HEALTHY] " : "[UNHEALTHY]")
-          //      << (in_trusted_net ? "[TRUSTED]" : "[UNTRUSTED]") << " Got "
-          //      << (int)*rd << "." << (int)*(rd + 1) << "." << (int)*(rd + 2)
-          //      << "." << (int)*(rd + 3) << " from " << *response.dns_server
-          //      << ENDL;
+          // VERB("[" << pipelined_id_ << "] [A]"
+          //          << (from_healthy_dns ? "[HEALTHY] " : "[UNHEALTHY]")
+          //          << (in_trusted_net ? "[TRUSTED]" : "[UNTRUSTED]")
+          //          << " Got " << (int)*rd << "." << (int)*(rd + 1)
+          //          << "." << (int)*(rd + 2)  << "." << (int)*(rd + 3)
+          //          << " from " << *response.dns_server);
           Transit(in_trusted_net, from_healthy_dns, response.payload);
         } else {
-          // VERB << "[" << pipelined_id_ << "] [OTHER]"
-          //      << (from_healthy_dns ? "[HEALTHY] " : "[UNHEALTHY]")
-          //      << " Got response from " << *response.dns_server << ENDL;
+          // VERB("[" << pipelined_id_ << "] [OTHER]"
+          //          << (from_healthy_dns ? "[HEALTHY] " : "[UNHEALTHY]")
+          //          << " Got response from " << *response.dns_server);
           if (status_ == Status::kInit || status_ == Status::kWaitHealth) {
             candidate_response_ = response.payload;
           }

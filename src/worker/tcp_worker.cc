@@ -64,8 +64,8 @@ void TCPWorker::OnInternalRecv(uv_stream_t* handle,
         if (send_cb_)
           send_cb_(pkt_id, remote_server_, 0);
         query_pool_.erase(pkt_id);
-        VERB << "[" << pkt_id << "][TCP Worker][" << *remote_server_
-             << "] Session removed from pool" << ENDL;
+        VERB("[" << pkt_id << "][TCP Worker][" << *remote_server_
+                 << "] Session removed from pool");
         if (recv_cb_)
           recv_cb_(CrPacket{.payload = pkt, .dns_server = remote_server_});
       } else {
@@ -178,8 +178,8 @@ int TCPWorker::RequestSend(Query* query) {
 int TCPWorker::Send(std::shared_ptr<CrSession> session) {
   if (uv_tcp_ == nullptr) {
     int rtn = RequestConnect();
-    VERB << "[" << session->pipelined_id_ << "][TCPWorker] Connect to "
-         << *remote_server_ << ", " << *(UVError*)&rtn << ENDL;
+    VERB("[" << session->pipelined_id_ << "][TCPWorker] Connect to "
+             << *remote_server_ << ", " << *(UVError*)&rtn);
     if (rtn < 0) {
       return rtn;
     }
@@ -211,8 +211,8 @@ int TCPWorker::InternalClose() {
     auto& query = it->second;
     if (++query.retry_count > kRetryThreshold) {
       /* TODO: Check SessionManager::Has(it->first) */
-      VERB << "[" << it->first << "][TCP Worker] Session removed from ["
-           << *remote_server_ << "]'s pool due to retry overlimit" << ENDL;
+      VERB("[" << it->first << "][TCP Worker] Session removed from ["
+               << *remote_server_ << "]'s pool due to retry overlimit");
       if (send_cb_)
         send_cb_(it->first, remote_server_, UV_ECONNABORTED);
       it = query_pool_.erase(it);
@@ -224,9 +224,8 @@ int TCPWorker::InternalClose() {
   int query_count = (int)query_pool_.size();
   if (query_count > 0) {
     int rtn = RequestConnect();
-    VERB << "[TCP Worker][" << *remote_server_
-         << "]: Pipelined connect returns " << *(UVError*)&rtn
-         << " for queued query" << ENDL;
+    VERB("[TCP Worker][" << *remote_server_ << "]: Pipelined connect returns "
+                         << *(UVError*)&rtn << " for queued query");
     if (rtn < 0) {
       return rtn;
     }

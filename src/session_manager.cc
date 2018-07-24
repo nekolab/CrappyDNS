@@ -106,8 +106,8 @@ void CrSessionManager::OnRemoteRecv(CrPacket response) {
   }
 
   uint16_t pipelined_id = ns_msg_id(msg);
-  VERB << "[" << pipelined_id << "] Received response from "
-       << *response.dns_server << ENDL;
+  VERB("[" << pipelined_id << "] Received response from "
+           << *response.dns_server);
   auto session = Get(pipelined_id);
   if (session != nullptr) {
     session->Resolve(response, msg);
@@ -124,13 +124,12 @@ void CrSessionManager::Resolve(uint16_t pipelined_id) {
   ns_put16(session->raw_id_,
            (unsigned char*)session->candidate_response_->data());
   server_->Send(session);
-  VERB << "[" << session->pipelined_id_ << "] Session resolved" << ENDL;
+  VERB("[" << session->pipelined_id_ << "] Session resolved");
 }
 
 void CrSessionManager::PrepareServer() {
   server_->recv_cb_ = [this](CrPacket packet) {
-    VERB << "[Server] Request received from " << *(SockAddr*)(packet.addr.get())
-         << ENDL;
+    VERB("[Server] Request received from " << *(SockAddr*)(packet.addr.get()));
     auto session = this->Create(packet);
     if (session == nullptr)
       return;
@@ -142,8 +141,8 @@ void CrSessionManager::PrepareSender() {
   sender_.send_cb_ = [this](uint16_t session_id,
                             std::shared_ptr<const CrDNSServer> server,
                             int status) {
-    VERB << "[" << session_id << "] Send to " << *server << ", "
-         << *(UVError*)&status << ENDL;
+    VERB("[" << session_id << "] Send to " << *server << ", "
+             << *(UVError*)&status);
     if (status != 0) {
       auto session = this->Get(session_id);
       if (session) {
@@ -153,8 +152,8 @@ void CrSessionManager::PrepareSender() {
   };
 
   sender_.recv_cb_ = [this](CrPacket response) {
-    VERB << "[Worker] Recved " << response.payload->size() << " bytes from "
-         << *response.dns_server << ENDL;
+    VERB("[Worker] Recved " << response.payload->size() << " bytes from "
+                            << *response.dns_server);
     this->OnRemoteRecv(response);
   };
 
@@ -180,7 +179,7 @@ void CrSessionManager::GenShuffleSequence(uint_fast32_t seed) {
       pokers[i] = pokers[j];
       pokers[j] = val;
     }
-    VERB << "[Init] Shuffle param: [ ";
+    VERB_R("[Init] Shuffle param: [ ");
     for (size_t i = 0; i < 16; ++i)
       VERB_S << unsigned(pokers[i]) << " ";
     VERB_S << "]" << ENDL;
@@ -198,6 +197,6 @@ uint16_t CrSessionManager::GenPipelinedID() {
     counter ^= (mask << i) | (mask << j);
   }
 
-  VERB << "[" << counter << "] Session ID generated from " << counter_ << ENDL;
+  VERB("[" << counter << "] Session ID generated from " << counter_);
   return counter;
 }
