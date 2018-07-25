@@ -83,7 +83,7 @@ void UDPWorker::OnInternalRecv(uv_udp_t* handle,
   if (handle != uv_udp_)
     return;
   if ((flags & UV_UDP_PARTIAL) != 0) {
-    INFO << "[UDP Worker] Met UV_UDP_PARTIAL" << ENDL;
+    INFO << "[UDP Worker] Met UV_UDP_PARTIAL from " << *(SockAddr*)addr << ENDL;
     return;
   }
 
