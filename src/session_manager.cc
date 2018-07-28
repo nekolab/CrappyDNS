@@ -179,10 +179,10 @@ void CrSessionManager::GenShuffleSequence(uint_fast32_t seed) {
       pokers[i] = pokers[j];
       pokers[j] = val;
     }
-    VERB_R("[Init] Shuffle param: [ ");
+    VERB_R("[Init] Shuffle: ");
     for (size_t i = 0; i < 16; ++i)
-      VERB_S << unsigned(pokers[i]) << " ";
-    VERB_S << "]" << ENDL;
+      VERB_S << unsigned(pokers[i]) << ",";
+    VERB_S << "\b " << ENDL;
   }
 }
 

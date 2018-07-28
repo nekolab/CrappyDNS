@@ -52,7 +52,7 @@ void PrintHelpMessage() {
     "[-t, --timeout <msec>]\tTimeout for each session, default to 3000\n"
     "[-a, --run-as <user>]\tRun as another user\n"
     "[-v, --version]\t\tPrint version and exit\n"
-    "[-V, --verbose]\t\tVerbose logging\n"
+    "[-V, --verbose]\t\tVerbose logging, use twice to output more details\n"
     "[-h, --help]\t\tPrint this message\n");
   // clang-format on
 }
@@ -140,6 +140,9 @@ char ParseConfig(int argc, char** argv) {
         exit(0);
         break;
       case 'V':
+        if (CrConfig::verbose_mode) {
+          CrConfig::debug_mode = true;
+        }
         CrConfig::verbose_mode = true;
         break;
       case 'h':

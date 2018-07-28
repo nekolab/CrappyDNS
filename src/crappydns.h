@@ -65,6 +65,7 @@ struct CrPacket {
 };
 
 struct CrConfig {
+  static bool debug_mode;
   static bool verbose_mode;
   static uint64_t timeout_in_ms;
   static const char* run_as_user;

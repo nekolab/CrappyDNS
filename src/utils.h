@@ -35,12 +35,15 @@
 
 extern std::ostream __null_stream;
 
-#define __LOG(stream, prefix)                                                  \
-  std::time_t __now;                                                           \
-  std::time(&__now);                                                           \
-  char __log_time_buf[10];                                                     \
-  std::strftime(__log_time_buf, 10, "%H:%M:%S", std::localtime(&__now));       \
-  stream << "[" << (const char*)__log_time_buf << "]" << prefix << std::flush; \
+#define __LOG(stream, prefix)                                              \
+  do {                                                                     \
+    std::time_t __now;                                                     \
+    std::time(&__now);                                                     \
+    char __log_time_buf[10];                                               \
+    std::strftime(__log_time_buf, 10, "%H:%M:%S", std::localtime(&__now)); \
+    stream << "[" << (const char*)__log_time_buf << "]" << prefix          \
+           << std::flush;                                                  \
+  } while (0);                                                             \
   stream
 
 #define LOG_S std::cout
@@ -48,21 +51,26 @@ extern std::ostream __null_stream;
 #define WARN_S std::cout
 #define INFO_S std::cout
 
-#define LOG __LOG(LOG_S, "[LOG] ")
-#define ERR __LOG(ERR_S, "[ERR] ")
+#define LOG __LOG(LOG_S, "[LOG]  ")
+#define ERR __LOG(ERR_S, "[ERR]  ")
 #define WARN __LOG(WARN_S, "[WARN] ")
 #define INFO __LOG(INFO_S, "[INFO] ")
 
-#define __VERB(content, end_with_lf)        \
-  if (CrConfig::verbose_mode) {             \
-    __LOG(std::cout, "[VERB] ") << content; \
-    if (end_with_lf)                        \
-      std::cout << std::endl;               \
+#define __VERB(content, prefix, flag, auto_lf) \
+  if (flag) {                                  \
+    __LOG(std::cout, prefix) << content;       \
+    if (auto_lf)                               \
+      std::cout << std::endl;                  \
   }
 
-#define VERB(content) __VERB(content, true)
-#define VERB_R(content) __VERB(content, false)
+#define VERB(content) __VERB(content, "[VERB] ", CrConfig::verbose_mode, true)
+#define VERB_R(content) \
+  __VERB(content, "[VERB] ", CrConfig::verbose_mode, false)
 #define VERB_S (CrConfig::verbose_mode ? std::cout : __null_stream)
+
+#define DEBUG(content) __VERB(content, "[DEBUG]", CrConfig::debug_mode, true)
+#define DEBUG_R(content) __VERB(content, "[DEBUG]", CrConfig::debug_mode, false)
+#define DEBUG_S (CrConfig::debug_mode ? std::cout : __null_stream)
 
 #define ENDL std::endl
 

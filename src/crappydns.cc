@@ -23,6 +23,7 @@
 #include "trusted_net.h"
 
 // CrConfig static initialization
+bool CrConfig::debug_mode(false);
 bool CrConfig::verbose_mode(false);
 uint64_t CrConfig::timeout_in_ms(3000);
 const char* CrConfig::run_as_user(nullptr);
